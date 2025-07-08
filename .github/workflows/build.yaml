@@ -38,7 +38,7 @@ jobs:
             exit 1
           fi
           chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleDebug --stacktrace --warning-mode=none
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
