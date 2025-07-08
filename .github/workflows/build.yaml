@@ -51,7 +51,7 @@ jobs:
           rm -f "$BASE_DIR/custom_spider.jar"
           rm -rf "$BASE_DIR/Smali_classes"
 
-          java -jar "$BASE_DIR/3rd/apktool_2.11.0.jar" d -f --only-main-classes "$BASE_DIR/../app/build/outputs/apk/release/app-release-unsigned.apk" -o "$BASE_DIR/Smali_classes"
+          java -jar "$BASE_DIR/3rd/apktool_2.11.0.jar" d -f --only-main-classes "project/app/build/outputs/apk/release/app-release-unsigned.apk" -o "$BASE_DIR/Smali_classes"
 
           rm -rf "$BASE_DIR/spider.jar/smali/com/github/catvod/spider"
           rm -rf "$BASE_DIR/spider.jar/smali/com/github/catvod/js"
