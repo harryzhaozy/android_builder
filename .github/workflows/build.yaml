@@ -47,7 +47,7 @@ jobs:
       - name: Rebuild custom_spider.jar
         run: |
           set -e
-          BASE_DIR="./project/jar"
+          BASE_DIR="project/jar"
           rm -f "$BASE_DIR/custom_spider.jar"
           rm -rf "$BASE_DIR/Smali_classes"
 
