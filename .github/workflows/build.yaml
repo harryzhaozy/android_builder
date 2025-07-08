@@ -39,8 +39,47 @@ jobs:
           fi
           chmod +x gradlew
           ./gradlew assembleDebug --stacktrace 
-      - name: Upload APK
+      #- name: Upload APK
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: my-build-apk
+      #    path: project/**/*.apk
+      - name: Rebuild custom_spider.jar
+        run: |
+          set -e
+          BASE_DIR="$(pwd)"
+          rm -f "$BASE_DIR/custom_spider.jar"
+          rm -rf "$BASE_DIR/Smali_classes"
+
+          java -jar "$BASE_DIR/3rd/apktool_2.11.0.jar" d -f --only-main-classes "$BASE_DIR/../app/build/outputs/apk/release/app-release-unsigned.apk" -o "$BASE_DIR/Smali_classes"
+
+          rm -rf "$BASE_DIR/spider.jar/smali/com/github/catvod/spider"
+          rm -rf "$BASE_DIR/spider.jar/smali/com/github/catvod/js"
+          rm -rf "$BASE_DIR/spider.jar/smali/org/slf4j"
+
+          mkdir -p "$BASE_DIR/spider.jar/smali/com/github/catvod"
+          mkdir -p "$BASE_DIR/spider.jar/smali/org/slf4j"
+
+          mv "$BASE_DIR/Smali_classes/smali/com/github/catvod/spider" "$BASE_DIR/spider.jar/smali/com/github/catvod/"
+          mv "$BASE_DIR/Smali_classes/smali/com/github/catvod/js" "$BASE_DIR/spider.jar/smali/com/github/catvod/"
+          mv "$BASE_DIR/Smali_classes/smali/org/slf4j" "$BASE_DIR/spider.jar/smali/org/slf4j/"
+
+          java -jar "$BASE_DIR/3rd/apktool_2.11.0.jar" b "$BASE_DIR/spider.jar" -c
+
+          mv "$BASE_DIR/spider.jar/dist/dex.jar" "$BASE_DIR/custom_spider.jar"
+
+          md5sum "$BASE_DIR/custom_spider.jar" | awk '{ print $1 }' > "$BASE_DIR/custom_spider.jar.md5"
+
+          rm -rf "$BASE_DIR/spider.jar/build"
+          rm -rf "$BASE_DIR/spider.jar/smali"
+          rm -rf "$BASE_DIR/spider.jar/dist"
+          rm -rf "$BASE_DIR/Smali_classes"
+      - name: Upload custom_spider.jar
         uses: actions/upload-artifact@v4
         with:
-          name: my-build-apk
-          path: project/**/*.apk
+          name: custom_spider
+          path: |
+            custom_spider.jar
+            custom_spider.jar.md5
+
+
