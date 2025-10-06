@@ -23,13 +23,29 @@ jobs:
             exit 1
           fi
 
+      #- id: get-project
+      #  name: Get project name
+      #  run: echo "PROJECT=$(cat project-to-build)" >> $GITHUB_OUTPUT
+
+      #- name: Clone project
+      #  run: git clone --depth=1 ${{ steps.get-project.outputs.PROJECT }} project
+
       - id: get-project
         name: Get project name
-        run: echo "PROJECT=$(cat project-to-build)" >> $GITHUB_OUTPUT
+        run: |
+          PROJECT=$(cat project-to-build)
+          REPO_URL=$(echo "$PROJECT" | cut -d'@' -f1)
+          BRANCH=$(echo "$PROJECT" | cut -s -d'@' -f2)
+          if [ -z "$BRANCH" ]; then
+            BRANCH="main"
+          fi
+          echo "REPO_URL=$REPO_URL" >> $GITHUB_OUTPUT
+          echo "BRANCH=$BRANCH" >> $GITHUB_OUTPUT
 
       - name: Clone project
-        run: git clone --depth=1 ${{ steps.get-project.outputs.PROJECT }} project
-
+        run: |
+          git clone --depth=1 -b ${{ steps.get-project.outputs.BRANCH }} ${{ steps.get-project.outputs.REPO_URL }} project
+          
       - name: Build the app
         working-directory: ./project
         run: |
